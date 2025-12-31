@@ -1,0 +1,13 @@
+[package]
+name = "file-logger-script"
+version = "0.1.0"
+authors = ["Bryce Mecum <petridish@gmail.com>"]
+edition = "2024"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+gromnie-scripting-api = { path = "../../gromnie/crates/gromnie-scripting-api", default-features = false }
