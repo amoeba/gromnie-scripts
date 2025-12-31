@@ -1,123 +1,104 @@
-#![allow(unsafe_op_in_unsafe_fn)]
-
-// Generate bindings directly in this crate
-wit_bindgen::generate!({
-    path: "../../crates/gromnie-scripting/src/wit",
-    world: "script",
-});
-
-use self::gromnie::scripting::host;
-use self::exports::gromnie::scripting::guest::Guest;
+use gromnie_scripting_api as gromnie;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-// Event filter constants
-const EVENT_CHAT_MESSAGE_RECEIVED: u32 = 3;
-
-/// Script state
 struct FileLoggerScript {
     log_file: Option<std::fs::File>,
 }
 
-static mut SCRIPT: FileLoggerScript = FileLoggerScript { log_file: None };
-
-struct MyGuest;
-
-impl Guest for MyGuest {
-    fn get_id() -> String {
-        "file_logger_wasm".to_string()
+impl gromnie::Script for FileLoggerScript {
+    fn new() -> Self {
+        FileLoggerScript { log_file: None }
     }
 
-    fn get_name() -> String {
-        "File Logger (WASM)".to_string()
+    fn id(&self) -> &str {
+        "file_logger_wasm"
     }
 
-    fn get_description() -> String {
-        "WASM component that logs chat messages to /script_data/chat.log".to_string()
+    fn name(&self) -> &str {
+        "File Logger (WASM)"
     }
 
-    fn on_load() {
-        unsafe {
-            // Open log file in append mode
-            // WASI preopens /script_data to ~/.config/gromnie/script_data/
-            match OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open("/script_data/chat.log")
-            {
-                Ok(file) => {
-                    SCRIPT.log_file = Some(file);
+    fn description(&self) -> &str {
+        "WASM component that logs chat messages to /script_data/chat.log"
+    }
 
-                    // Write a startup message
-                    if let Some(ref mut f) = SCRIPT.log_file {
-                        let _ = writeln!(f, "\n=== File Logger WASM started ===");
-                        let _ = f.flush();
-                    }
+    fn on_load(&mut self) {
+        // Open log file in append mode
+        // WASI preopens /script_data to ~/.config/gromnie/script_data/
+        match OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open("/script_data/chat.log")
+        {
+            Ok(file) => {
+                self.log_file = Some(file);
 
-                    host::log("File logger started - logging to /script_data/chat.log");
+                // Write a startup message
+                if let Some(ref mut f) = self.log_file {
+                    let _ = writeln!(f, "\n=== File Logger WASM started ===");
+                    let _ = f.flush();
                 }
-                Err(e) => {
-                    // Can't log to file
-                    let error_msg = format!("Failed to open log file: {}", e);
-                    host::log(&error_msg);
-                    host::send_chat(&error_msg);
-                }
+
+                gromnie::log("File logger started - logging to /script_data/chat.log");
+            }
+            Err(e) => {
+                // Can't log to file
+                let error_msg = format!("Failed to open log file: {}", e);
+                gromnie::log(&error_msg);
+                gromnie::send_chat(&error_msg);
             }
         }
     }
 
-    fn on_unload() {
-        unsafe {
-            // Write shutdown message and close file
-            if let Some(ref mut f) = SCRIPT.log_file {
-                let _ = writeln!(f, "=== File Logger WASM stopped ===\n");
-                let _ = f.flush();
-            }
-            SCRIPT.log_file = None;
-            host::log("File logger stopped");
+    fn on_unload(&mut self) {
+        // Write shutdown message and close file
+        if let Some(ref mut f) = self.log_file {
+            let _ = writeln!(f, "=== File Logger WASM stopped ===\n");
+            let _ = f.flush();
         }
+        self.log_file = None;
+        gromnie::log("File logger stopped");
     }
 
-    fn subscribed_events() -> Vec<u32> {
+    fn subscribed_events(&self) -> Vec<u32> {
         // Subscribe to chat messages
-        vec![EVENT_CHAT_MESSAGE_RECEIVED]
+        vec![gromnie::events::EVENT_CHAT_MESSAGE_RECEIVED]
     }
 
-    fn on_event(event: host::GameEvent) {
-        unsafe {
-            match event {
-                host::GameEvent::ChatMessageReceived(chat_info) => {
-                    if let Some(ref mut file) = SCRIPT.log_file {
-                        // Get current timestamp
-                        let timestamp = host::get_event_time_millis();
+    fn on_event(&mut self, event: gromnie::GameEvent) {
+        match event {
+            gromnie::GameEvent::ChatMessageReceived(chat_info) => {
+                if let Some(ref mut file) = self.log_file {
+                    // Get current timestamp
+                    let timestamp = gromnie::get_event_time_millis();
 
-                        // Log the chat message
-                        let log_entry = format!(
-                            "[{}] [channel:{}] {}\n",
-                            timestamp,
-                            chat_info.channel,
-                            chat_info.message
-                        );
+                    // Log the chat message
+                    let log_entry = format!(
+                        "[{}] [channel:{}] {}\n",
+                        timestamp,
+                        chat_info.channel,
+                        chat_info.message
+                    );
 
-                        if let Err(e) = file.write_all(log_entry.as_bytes()) {
-                            // If write fails, log the error
-                            let error_msg = format!("Log write failed: {}", e);
-                            host::log(&error_msg);
-                            host::send_chat(&error_msg);
-                        } else {
-                            // Flush to ensure it's written immediately
-                            let _ = file.flush();
-                        }
+                    if let Err(e) = file.write_all(log_entry.as_bytes()) {
+                        // If write fails, log the error
+                        let error_msg = format!("Log write failed: {}", e);
+                        gromnie::log(&error_msg);
+                        gromnie::send_chat(&error_msg);
+                    } else {
+                        // Flush to ensure it's written immediately
+                        let _ = file.flush();
                     }
                 }
-                _ => {}
             }
+            _ => {}
         }
     }
 
-    fn on_tick(_delta_millis: u64) {
+    fn on_tick(&mut self, _delta_millis: u64) {
         // No periodic logic needed
     }
 }
 
-export!(MyGuest);
+gromnie::register_script!(FileLoggerScript);
