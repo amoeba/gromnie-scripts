@@ -66,32 +66,33 @@ impl gromnie::Script for FileLoggerScript {
         vec![gromnie::events::EVENT_CHAT_MESSAGE_RECEIVED]
     }
 
-    fn on_event(&mut self, event: gromnie::GameEvent) {
+    fn on_event(&mut self, event: gromnie::ScriptEvent) {
         match event {
-            gromnie::GameEvent::ChatMessageReceived(chat_info) => {
-                if let Some(ref mut file) = self.log_file {
-                    // Get current timestamp
-                    let timestamp = gromnie::get_event_time_millis();
+            gromnie::ScriptEvent::Game(game_event) => match game_event {
+                gromnie::GameEvent::ChatMessageReceived(chat_info) => {
+                    if let Some(ref mut file) = self.log_file {
+                        // Get current timestamp
+                        let timestamp = gromnie::get_event_time_millis();
 
-                    // Log the chat message
-                    let log_entry = format!(
-                        "[{}] [channel:{}] {}\n",
-                        timestamp,
-                        chat_info.channel,
-                        chat_info.message
-                    );
+                        // Log the chat message
+                        let log_entry = format!(
+                            "[{}] [channel:{}] {}\n",
+                            timestamp, chat_info.channel, chat_info.message
+                        );
 
-                    if let Err(e) = file.write_all(log_entry.as_bytes()) {
-                        // If write fails, log the error
-                        let error_msg = format!("Log write failed: {}", e);
-                        gromnie::log(&error_msg);
-                        gromnie::send_chat(&error_msg);
-                    } else {
-                        // Flush to ensure it's written immediately
-                        let _ = file.flush();
+                        if let Err(e) = file.write_all(log_entry.as_bytes()) {
+                            // If write fails, log the error
+                            let error_msg = format!("Log write failed: {}", e);
+                            gromnie::log(&error_msg);
+                            gromnie::send_chat(&error_msg);
+                        } else {
+                            // Flush to ensure it's written immediately
+                            let _ = file.flush();
+                        }
                     }
                 }
-            }
+                _ => {}
+            },
             _ => {}
         }
     }

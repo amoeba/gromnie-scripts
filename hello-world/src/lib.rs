@@ -1,10 +1,10 @@
 use gromnie_scripting_api as gromnie;
 
 struct HelloWorld {
-     timer_id: Option<u64>,
- }
- 
- impl gromnie::Script for HelloWorld {
+    timer_id: Option<u64>,
+}
+
+impl gromnie::Script for HelloWorld {
     fn new() -> Self {
         HelloWorld { timer_id: None }
     }
@@ -33,18 +33,33 @@ struct HelloWorld {
         vec![gromnie::events::EVENT_CREATE_OBJECT]
     }
 
-    fn on_event(&mut self, event: gromnie::GameEvent) {
+    fn on_event(&mut self, event: gromnie::ScriptEvent) {
         match event {
-            gromnie::GameEvent::CreateObject(obj) => {
-                gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
+            gromnie_scripting_api::ScriptEvent::Game(game_event) => {
+                // log
+                match game_event {
+                    gromnie_scripting_api::GameEvent::CharacterListReceived(account) => {
+                        gromnie::log(&format!("CharacterListReceived received: {:?}", account));
+                    },
+                    gromnie_scripting_api::GameEvent::CreateObject(_world_object) => {
+                        // gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
+                        // Schedule a 5-second timer
+                        // let timer_id = gromnie::schedule_timer(5, "greeting");
+                        // self.timer_id = Some(timer_id);
+                        // gromnie::log("Scheduled 5-second greeting timer");
+                    },
+                    gromnie_scripting_api::GameEvent::ChatMessageReceived(_chat_message) => {
+                        // gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
+                    },
+                }
 
-                // Schedule a 5-second timer
-                let timer_id = gromnie::schedule_timer(5, "greeting");
-                self.timer_id = Some(timer_id);
-
-                gromnie::log("Scheduled 5-second greeting timer");
-            }
-            _ => {}
+            },
+            gromnie_scripting_api::ScriptEvent::State(_state_event) => {
+                // log
+            },
+            gromnie_scripting_api::ScriptEvent::System(_system_event) => {
+                // log
+            },
         }
     }
 
