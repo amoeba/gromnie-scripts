@@ -58,13 +58,26 @@ fn install() -> Result<()> {
     println!("Installing scripts...");
     
     let root = get_workspace_root()?;
+    let scripts = find_script_dirs(&root)?;
     let install_dir = get_install_dir()?;
     
     // Create target directory
     fs::create_dir_all(&install_dir)
         .context(format!("Failed to create {}", install_dir.display()))?;
     
-    // Check both workspace-level and script-level target directories
+    // Build set of expected wasm filenames (crate names with underscores)
+    let mut expected_wasm_files = std::collections::HashSet::new();
+    for script_dir in &scripts {
+        let script_name = script_dir
+            .file_name()
+            .and_then(|n| n.to_str())
+            .context("Invalid script directory name")?;
+        // Convert hyphens to underscores for wasm filename
+        let wasm_name = format!("{}.wasm", script_name.replace("-", "_"));
+        expected_wasm_files.insert(wasm_name);
+    }
+    
+    // Install only the expected wasm files
     let workspace_wasm_dir = root.join("target/wasm32-wasip2/release");
     
     if workspace_wasm_dir.exists() {
@@ -72,14 +85,18 @@ fn install() -> Result<()> {
             let entry = entry?;
             let path = entry.path();
             
-            if path.extension().map(|e| e == "wasm").unwrap_or(false) && path.is_file() {
-                let filename = path.file_name().unwrap();
-                let target_path = install_dir.join(filename);
+            if path.is_file() && path.extension().map(|e| e == "wasm").unwrap_or(false) {
+                let filename = path.file_name().unwrap().to_string_lossy().to_string();
                 
-                fs::copy(&path, &target_path)
-                    .context(format!("Failed to copy {} to install directory", path.display()))?;
-                
-                println!("  Installed {}", filename.to_string_lossy());
+                // Only copy if it's an expected script wasm file
+                if expected_wasm_files.contains(&filename) {
+                    let target_path = install_dir.join(&filename);
+                    
+                    fs::copy(&path, &target_path)
+                        .context(format!("Failed to copy {} to install directory", path.display()))?;
+                    
+                    println!("  Installed {}", filename);
+                }
             }
         }
     }
