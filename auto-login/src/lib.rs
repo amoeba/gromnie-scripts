@@ -10,11 +10,11 @@ impl gromnie::Script for AutoLoginScript {
     }
 
     fn id(&self) -> &str {
-        "auto_login_wasm"
+        "auto-login"
     }
 
     fn name(&self) -> &str {
-        "Auto Login (WASM)"
+        "Auto Login"
     }
 
     fn description(&self) -> &str {

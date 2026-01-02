@@ -10,15 +10,15 @@ impl gromnie::Script for HelloWorld {
     }
 
     fn id(&self) -> &str {
-        "hello_world_wasm"
+        "hello-world"
     }
 
     fn name(&self) -> &str {
-        "Hello World (WASM)"
+        "Hello World"
     }
 
     fn description(&self) -> &str {
-        "WASM component that sends a greeting 5 seconds after an object is created"
+        "Sends a greeting 5 seconds after an object is created"
     }
 
     fn on_load(&mut self) {
@@ -40,26 +40,25 @@ impl gromnie::Script for HelloWorld {
                 match game_event {
                     gromnie_scripting_api::GameEvent::CharacterListReceived(account) => {
                         gromnie::log(&format!("CharacterListReceived received: {:?}", account));
-                    },
+                    }
                     gromnie_scripting_api::GameEvent::CreateObject(_world_object) => {
                         // gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
                         // Schedule a 5-second timer
                         // let timer_id = gromnie::schedule_timer(5, "greeting");
                         // self.timer_id = Some(timer_id);
                         // gromnie::log("Scheduled 5-second greeting timer");
-                    },
+                    }
                     gromnie_scripting_api::GameEvent::ChatMessageReceived(_chat_message) => {
                         // gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
-                    },
+                    }
                 }
-
-            },
+            }
             gromnie_scripting_api::ScriptEvent::State(_state_event) => {
                 // log
-            },
+            }
             gromnie_scripting_api::ScriptEvent::System(_system_event) => {
                 // log
-            },
+            }
         }
     }
 

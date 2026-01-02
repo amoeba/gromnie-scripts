@@ -12,15 +12,15 @@ impl gromnie::Script for FileLoggerScript {
     }
 
     fn id(&self) -> &str {
-        "file_logger_wasm"
+        "file-logger"
     }
 
     fn name(&self) -> &str {
-        "File Logger (WASM)"
+        "File Logger"
     }
 
     fn description(&self) -> &str {
-        "WASM component that logs chat messages to /script_data/chat.log"
+        "Logs chat messages to /script_data/chat.log"
     }
 
     fn on_load(&mut self) {
