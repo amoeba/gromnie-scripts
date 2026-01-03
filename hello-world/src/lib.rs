@@ -51,6 +51,9 @@ impl gromnie::Script for HelloWorld {
                     gromnie_scripting_api::GameEvent::ChatMessageReceived(_chat_message) => {
                         // gromnie::log(&format!("Object created: {} (ID: {})", obj.name, obj.id));
                     }
+                    gromnie_scripting_api::GameEvent::CharacterError(_error) => {
+                        // Handle character error
+                    }
                 }
             }
             gromnie_scripting_api::ScriptEvent::State(_state_event) => {

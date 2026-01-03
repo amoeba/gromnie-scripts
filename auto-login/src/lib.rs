@@ -1,4 +1,4 @@
-use gromnie_scripting_api::{self as gromnie, bindings::host::ClientState};
+use gromnie_scripting_api as gromnie;
 
 struct AutoLoginScript {
     handled: bool,
@@ -38,37 +38,50 @@ impl gromnie::Script for AutoLoginScript {
         match event {
             gromnie::ScriptEvent::Game(game_event) => match game_event {
                 gromnie::GameEvent::CharacterListReceived(account) => {
+                    gromnie::log(&format!(
+                        "Auto Login: CharacterListReceived event received, handled={}",
+                        self.handled
+                    ));
+
                     // Only handle once
                     if self.handled {
+                        gromnie::log("Auto Login: Already handled, returning");
                         return;
                     }
 
                     // Only proceed if we're at character select screen
                     let client = gromnie::get_client_state();
-                    if client.state != ClientState::Charselect {
+                    gromnie::log(&format!("Auto Login: Client state = {:?}", client.session.state));
+
+                    if !matches!(client.scene, gromnie::bindings::host::Scene::CharacterSelect(_)) {
+                        gromnie::log(&format!(
+                            "Auto Login: Not at character select, returning. State: {:?}",
+                            client.session.state
+                        ));
                         return;
                     }
 
                     self.handled = true;
 
                     // Check if there are any characters
-                    if account.character_list.is_empty() {
+                    if account.characters.is_empty() {
                         gromnie::log(&format!(
-                            "Auto Login: No characters found on account '{}'. Cannot auto-login.",
-                            account.name
+                            "Auto Login: No characters found on account. Cannot auto-login."
                         ));
                         return;
                     }
 
                     // Use the first character
-                    let first_char = &account.character_list[0];
+                    let first_char = &account.characters[0];
                     gromnie::log(&format!(
                         "Auto Login: Logging in as first character '{}' (ID: {})",
                         first_char.name, first_char.id
                     ));
 
                     // Send the login action
-                    gromnie::login_character(&account.name, first_char.id, &first_char.name);
+                    gromnie::log("Auto Login: Calling login_character");
+                    gromnie::login_character(&account.account, first_char.id as u32, &first_char.name);
+                    gromnie::log("Auto Login: login_character called successfully");
                 }
                 _ => {}
             },
