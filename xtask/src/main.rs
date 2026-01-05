@@ -156,13 +156,7 @@ fn find_script_dirs(root: &Path) -> Result<Vec<PathBuf>> {
 }
 
 fn get_install_dir() -> Result<PathBuf> {
-    if cfg!(target_os = "macos") {
-        let mut path = dirs::home_dir().context("Could not determine home directory")?;
-        path.push("Library/Application Support/gromnie/scripts");
-        Ok(path)
-    } else {
-        let mut path = dirs::home_dir().context("Could not determine home directory")?;
-        path.push(".local/share/gromnie/scripts");
-        Ok(path)
-    }
+    let mut path = dirs::home_dir().context("Could not determine home directory")?;
+    path.push(".local/share/gromnie/scripts");
+    Ok(path)
 }

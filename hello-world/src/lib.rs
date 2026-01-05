@@ -54,6 +54,9 @@ impl gromnie::Script for HelloWorld {
                     gromnie_scripting_api::GameEvent::CharacterError(_error) => {
                         // Handle character error
                     }
+                    gromnie_scripting_api::GameEvent::Protocol(_protocol_event) => {
+                        // Handle full protocol events
+                    }
                 }
             }
             gromnie_scripting_api::ScriptEvent::State(_state_event) => {

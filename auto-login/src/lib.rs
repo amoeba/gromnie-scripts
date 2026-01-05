@@ -51,9 +51,12 @@ impl gromnie::Script for AutoLoginScript {
 
                     // Only proceed if we're at character select screen
                     let client = gromnie::get_client_state();
-                    gromnie::log(&format!("Auto Login: Client state = {:?}", client.session.state));
+                    gromnie::log(&format!(
+                        "Auto Login: Client state = {:?}",
+                        client.session.state
+                    ));
 
-                    if !matches!(client.scene, gromnie::bindings::host::Scene::CharacterSelect(_)) {
+                    if !matches!(client.scene, Scene::CharacterSelect(_)) {
                         gromnie::log(&format!(
                             "Auto Login: Not at character select, returning. State: {:?}",
                             client.session.state
@@ -75,12 +78,16 @@ impl gromnie::Script for AutoLoginScript {
                     let first_char = &account.characters[0];
                     gromnie::log(&format!(
                         "Auto Login: Logging in as first character '{}' (ID: {})",
-                        first_char.name, first_char.id
+                        first_char.name, first_char.character_id
                     ));
 
                     // Send the login action
                     gromnie::log("Auto Login: Calling login_character");
-                    gromnie::login_character(&account.account, first_char.id as u32, &first_char.name);
+                    gromnie::login_character(
+                        &account.account,
+                        first_char.character_id,
+                        &first_char.name,
+                    );
                     gromnie::log("Auto Login: login_character called successfully");
                 }
                 _ => {}
