@@ -29,9 +29,7 @@ impl gromnie::Script for Echo {
 
     fn subscribed_events(&self) -> Vec<u32> {
         // Subscribe to all events
-        vec![
-            gromnie::events::EVENT_ALL,
-        ]
+        vec![gromnie::events::EVENT_ALL]
     }
 
     fn on_event(&mut self, event: gromnie::ScriptEvent) {

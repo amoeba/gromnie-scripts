@@ -40,6 +40,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
+name = "counter"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+]
+
+[[package]]
 name = "dirs"
 version = "5.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -92,8 +99,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "gromnie-script-echo-tell"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "gromnie-script-spell-caster"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "gromnie-script-trade-acceptor"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "gromnie-scripting-api"
 version = "0.1.0"
+source = "git+https://github.com/amoeba/gromnie#afe04f93afe4a3741fd1fcda1eb6193a639e8d98"
 dependencies = [
  "wit-bindgen",
 ]
@@ -151,6 +183,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
 
 [[package]]
+name = "keyboard-logger"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+]
+
+[[package]]
 name = "leb128"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -185,6 +224,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
 
 [[package]]
+name = "movement-demo"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -195,6 +241,13 @@ name = "option-ext"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
+
+[[package]]
+name = "position-tracker"
+version = "0.1.0"
+dependencies = [
+ "gromnie-scripting-api",
+]
 
 [[package]]
 name = "prettyplease"

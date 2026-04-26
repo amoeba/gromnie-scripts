@@ -56,7 +56,7 @@ impl gromnie::Script for AutoLoginScript {
                         client.session.state
                     ));
 
-                    if !matches!(client.scene, Scene::CharacterSelect(_)) {
+                    if !matches!(client.scene, gromnie::Scene::CharacterSelect(_)) {
                         gromnie::log(&format!(
                             "Auto Login: Not at character select, returning. State: {:?}",
                             client.session.state

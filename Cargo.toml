@@ -1,5 +1,5 @@
 [workspace]
-members = ["auto-login", "echo", "file-logger", "hello-world", "xtask"]
+members = ["auto-login", "counter", "echo", "echo-tell", "file-logger", "hello-world", "keyboard-logger", "movement-demo", "position-tracker", "spell-caster", "trade-acceptor", "xtask"]
 resolver = "2"
 
 [workspace.package]
@@ -10,4 +10,4 @@ license = "MIT"
 publish = false
 
 [workspace.dependencies]
-gromnie-scripting-api = { path = "../gromnie/crates/gromnie-scripting-api", default-features = false }
+gromnie-scripting-api = { git = "https://github.com/amoeba/gromnie", default-features = false }
